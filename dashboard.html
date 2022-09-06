@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title> BFE </title>
+	<title>Ethan Magill</title>
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.6/css/selectize.css" />
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 	<link rel="stylesheet" href="/core/style.css">
@@ -22,7 +22,7 @@
 	</nav>
 
 	<div class="wrapper d-flex" style="position: absolute; width: 100%; height: calc(100vh - 70px);">
-		<nav class="collapse collapse-horizontal bg-light" id="toggleSidebar">
+		<nav class="collapse collapse-horizontal bg-light show" id="toggleSidebar">
 			<div class="p-3" style="width: 300px;">
 				<div class="form-text" >
 					<div id="type-selector">
@@ -52,11 +52,11 @@
 						<br>
 						<select class="selecty" name = "stock" id = "main-box"></select>
 						<br>
-						<input type="date" name="start" id="start">
-						<input type="date" name="end" id="end">
+						<input type="date" name="start" id="start" min="2019-11-01">
+						<input type="date" name="end" id="end" min="2019-11-01">
 						<br>
 						<br>
-						<input type = "button" onclick="goFunction()" value="Go!">
+						<input id="goBtn" type = "button" onclick="goFunction()" value="Go!">
 						<div id="test"></div>
 					</div>
 				</div>
@@ -68,12 +68,14 @@
 			</div>
 			<div id="buttons" style="display: flex; height: 40px; justify-content: right; align-items: center; text-align: right;">
 				<p style="margin: auto 5px;">Download data as:  </p>
-				<button onclick="downloadJson(JSON.stringify(combined),'data.json')">JSON</button>
-				<button onclick="downloadCSVstock(datapoints, times, tickers, 'data.csv')">CSV</button>
+				<div class="btn-group btn-group-sm pe-2">
+					<button class="btn btn-secondary btn-outline-light" onclick="downloadJson(JSON.stringify(combined),'data.json')">JSON</button>
+					<button class="btn btn-secondary btn-outline-light" onclick="downloadCSVstock(datapoints, times, tickers, 'data.csv')">CSV</button>
+			</div>
 			</div>
 
 		</div>
-		<div style="position: absolute; bottom: 0;"></div>
+
 
 
 	</div>
@@ -87,12 +89,25 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 	<script>
 	$(function() {
+		const dateToday = new Date();
+		let month = dateToday.getMonth() + 1;
+		let day = dateToday.getDate();
+		const year = dateToday.getFullYear();
+		if(month < 10)
+				month = '0' + month.toString();
+		if(day < 10)
+				day = '0' + day.toString();
+
+		const maxDate = year + '-' + month + '-' + day;
+		$('#start').attr('max', maxDate);
+		$('#end').attr('max', maxDate);
+
 		$("#type-box").change(function() {
-			let value, fileToRequest
+			let value, fileToRequest;
 
 			try {
 				value = $("#type-box :selected").parent().attr('label').split(' ').join('-');
-				fileToRequest = "/core/data/" + value + ".json"
+				fileToRequest = "/core/data/" + value + ".json";
 			} catch (error){
 				document.getElementById('data-selector').style.visibility = 'hidden';
 			}
@@ -122,7 +137,8 @@
 				});
 				document.getElementById('data-selector').style.visibility = 'visible';
 			})
-		})
+		});
+
 
 	})
 

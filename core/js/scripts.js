@@ -14,7 +14,10 @@ async function goFunction() {
   const type = document.getElementById('type-box').value;
   const startdate = document.getElementById('start').value;
   const enddate = document.getElementById('end').value;
-
+  if(startdate == "" || enddate == "") {
+    document.getElementById('test').innerHTML = "Please enter a valid date range.";
+    return;
+  }
 
   const stocks = [];
   for (let i=0; i<selectedOptions.length; i++) {
@@ -35,9 +38,12 @@ async function goFunction() {
     const receivedData = await callStockApi(stocks,startdate,enddate);
       tidyStock(receivedData, type);
       chartingFunction(datapoints,times,tickers);
+      $(".collapse").collapse("toggle");
   } catch (error) {
     if (error==429) {
       document.getElementById("test").innerHTML = "Too many requests. Only data for 5 stocks can be retrieved per minute. This includes multiple stocks in the same request.";
+    } else if (error=="TypeError: reduce of empty array with no initial value"){
+      document.getElementById("test").innerHTML = "Please enter a dataset."
     } else {
       document.getElementById("test").innerHTML = "Error: " + error + "<br>" + "Please report this error to ethanmagill@gmail.com, quoting the error code above.";
     }
